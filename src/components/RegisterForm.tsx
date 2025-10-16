@@ -35,9 +35,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onBackToLogin }) => {
     // usando o nome de usuário fornecido.
     if (!finalEmail) {
       // Sanitiza o nome de usuário para uso no e-mail
+      // Adicionando um hash simples para garantir unicidade se o nome de usuário for o mesmo
+      const uniqueSuffix = Math.random().toString(36).substring(2, 8);
       const sanitizedUsername = username.toLowerCase().replace(/[^a-z0-9]/g, '');
-      // Usamos um prefixo único para evitar colisões e garantir que o e-mail seja válido
-      finalEmail = `user_${sanitizedUsername}_${Date.now()}@temp.com`;
+      finalEmail = `${sanitizedUsername}_${uniqueSuffix}@temp.com`;
     }
 
     // 2. Chamar o Supabase signUp
@@ -54,7 +55,20 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onBackToLogin }) => {
     });
 
     if (error) {
-      showError("Falha no cadastro: " + error.message);
+      let errorMessage = "Falha no cadastro. Tente novamente.";
+      
+      if (error.message.includes("Password should be at least")) {
+        errorMessage = "A senha deve ter pelo menos 6 caracteres.";
+      } else if (error.message.includes("User already registered")) {
+        errorMessage = "Este e-mail (ou nome de usuário) já está em uso.";
+      } else if (error.message.includes("duplicate key value violates unique constraint")) {
+        // Isso pode acontecer se o nome de usuário for o mesmo e o e-mail fictício colidir
+        errorMessage = "Nome de usuário já em uso. Escolha outro.";
+      } else {
+        errorMessage = "Falha no cadastro: " + error.message;
+      }
+      
+      showError(errorMessage);
     } else {
       // Se a confirmação de e-mail estiver desativada no Supabase, o login deve ser imediato.
       showSuccess("Cadastro realizado! Você já pode fazer login.");
