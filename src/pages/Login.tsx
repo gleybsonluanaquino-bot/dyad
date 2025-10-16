@@ -102,11 +102,11 @@ const Login = () => {
       // URL da Edge Function (usando o ID do projeto)
       const functionUrl = `https://imzwknqvxqfqldnczpdv.supabase.co/functions/v1/resolve-username`;
       
+      // Não precisamos de token de autorização, pois a função usa o Service Role Key
       const response = await fetch(functionUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.auth.session()?.access_token || ''}`,
         },
         body: JSON.stringify({ username }),
       });
@@ -114,12 +114,18 @@ const Login = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        // Se o erro for 404 (User not found), retornamos null silenciosamente
+        if (response.status === 404) {
+            return null;
+        }
         throw new Error(data.error || 'Erro ao resolver nome de usuário.');
       }
 
       return data.email;
     } catch (error) {
       console.error("Erro na Edge Function:", error);
+      // Se houver um erro de rede ou outro erro interno, tratamos como falha
+      showError("Erro de comunicação com o servidor. Tente novamente.");
       return null;
     }
   };
@@ -138,7 +144,7 @@ const Login = () => {
     const emailToLogin = await resolveUsernameToEmail(username);
 
     if (!emailToLogin) {
-      showError("Usuário não encontrado ou erro de rede.");
+      showError("Usuário não encontrado.");
       setIsSubmitting(false);
       return;
     }

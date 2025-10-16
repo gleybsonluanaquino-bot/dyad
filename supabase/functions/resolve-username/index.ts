@@ -22,7 +22,6 @@ serve(async (req) => {
     }
 
     // Create a Supabase client with the Service Role Key
-    // This allows us to query the auth.users table
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -34,12 +33,14 @@ serve(async (req) => {
       }
     );
 
-    // Query auth.users table for the user whose raw_user_meta_data contains the username
-    // Note: This query might be slow on large tables as it relies on JSON operators.
+    // Query auth.users table using the service role client
+    // We must explicitly specify the schema 'auth' and table 'users'
+    // The query uses the JSON operator ->> to extract the 'username' field from 'raw_user_meta_data'
     const { data: users, error } = await supabaseAdmin.from('users')
       .select('email')
       .eq('raw_user_meta_data->>username', username)
-      .limit(1);
+      .limit(1)
+      .in('aud', ['authenticated']); // Optional: Filter by authenticated users, though service role bypasses RLS
 
     if (error) {
       console.error('Supabase query error:', error);
