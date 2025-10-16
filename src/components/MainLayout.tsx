@@ -5,6 +5,7 @@ import Sidebar from "./Sidebar";
 import { supabase } from "@/integrations/supabase/client";
 import { showError } from "@/utils/toast";
 import { MadeWithDyad } from "./made-with-dyad";
+import Logo from "./Logo";
 
 interface Profile {
   id: string;
@@ -68,8 +69,11 @@ const MainLayout: React.FC = () => {
       <Sidebar currentRole={currentRole} />
       <div className="flex flex-col">
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 md:hidden">
+          {/* No mobile, o Sidebar já contém o trigger do menu e o logo */}
           <Sidebar currentRole={currentRole} />
-          <div className="flex-1 text-lg font-semibold">FinApp Pro</div>
+          <div className="flex-1 text-lg font-semibold">
+            <Logo size="sm" />
+          </div>
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 overflow-auto">
           <Outlet />

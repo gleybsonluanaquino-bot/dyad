@@ -14,10 +14,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useAuth } from "@/integrations/supabase/session-context";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import Logo from "./Logo";
 
 const navItems = [
   { name: "Dashboard", href: "/", icon: Home, roles: ["ceo", "user"] },
@@ -73,14 +73,16 @@ const SidebarContent: React.FC<{ currentRole: string | null }> = ({ currentRole 
   };
 
   return (
-    <div className="flex flex-col gap-2 p-4">
-      <h1 className="text-xl font-bold mb-4 text-primary">FinApp Pro</h1>
-      <nav className="grid items-start gap-2">
+    <div className="flex flex-col gap-2 p-4 h-full">
+      <div className="mb-4">
+        <Logo />
+      </div>
+      <nav className="grid items-start gap-2 flex-1">
         {navItems.map((item) => (
           <NavLink key={item.name} item={item} currentRole={currentRole} />
         ))}
       </nav>
-      <div className="mt-auto pt-4 border-t">
+      <div className="pt-4 border-t">
         <Button
           variant="ghost"
           className="w-full justify-start text-red-500 hover:text-red-700"

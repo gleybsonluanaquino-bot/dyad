@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import { User, Lock, Check, X, ChevronDown } from "lucide-react";
+import Logo from "@/components/Logo";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -49,32 +50,19 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="grid md:grid-cols-2 max-w-5xl w-full bg-white dark:bg-gray-800 shadow-2xl rounded-xl overflow-hidden">
-        
-        {/* Coluna de Informações (Visual) */}
-        <div className="hidden md:flex flex-col items-center justify-center p-8 bg-primary/10 dark:bg-primary/20 relative">
-          <div className="absolute top-0 left-0 p-4 text-sm font-semibold text-primary dark:text-primary-foreground">
-            FinApp Pro - Sistema de Gestão Financeira
+      <Card className="w-full max-w-md shadow-2xl">
+        <CardHeader className="text-center space-y-4">
+          <div className="flex justify-center">
+            <Logo size="lg" />
           </div>
-          <div className="text-center max-w-xs">
-            <h2 className="text-3xl font-bold text-primary mb-4">
-              Fique por dentro!
-            </h2>
-            <p className="text-muted-foreground">
-              Aqui aparecerão todas as novidades e mensagens importantes do sistema para você.
-            </p>
-          </div>
-          {/* Placeholder para a imagem de fundo/mockups */}
-          <div className="mt-8 w-full h-48 bg-primary/20 dark:bg-primary/30 rounded-lg flex items-center justify-center text-primary/70">
-            Mockups do Sistema
-          </div>
-        </div>
-
-        {/* Coluna do Formulário de Login */}
-        <div className="p-8 lg:p-12 flex flex-col justify-center">
-          <h1 className="text-3xl font-bold mb-2">Bem Vindo!</h1>
-          <p className="text-lg text-muted-foreground mb-6">Acesse sua conta:</p>
-
+          <CardTitle className="text-2xl font-bold">
+            Acesso ao Sistema
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Insira suas credenciais para continuar.
+          </p>
+        </CardHeader>
+        <CardContent>
           <form onSubmit={handleLogin} className="space-y-6">
             {/* Seletor de Empresa/Filial (Mockup) */}
             <div className="space-y-2">
@@ -158,8 +146,8 @@ const Login = () => {
               </a>
             </div>
           </form>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
