@@ -11,6 +11,7 @@ import {
   BarChart,
   LogOut,
   Menu,
+  Banknote, // Adicionando Banknote para Cheques
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -24,10 +25,10 @@ const navItems = [
   { name: "Caixa", href: "/caixa", icon: DollarSign, roles: ["ceo", "caixa"] },
   { name: "Caixa (Atacadista)", href: "/atacadista", icon: DollarSign, roles: ["ceo", "atacado"] },
   { name: "Cobranças", href: "/cobrancas", icon: Receipt, roles: ["ceo", "cobranca"] },
-  { name: "Fornecedores", href: "/fornecedores", icon: Truck, roles: ["ceo", "compras"] },
+  { name: "Fornecedores", href: "/fornecedores", icon: Users, roles: ["ceo", "compras"] }, // Corrigido para Users
   { name: "Estoque", href: "/estoque", icon: Package, roles: ["ceo", "estoque"] },
   { name: "Despesas", href: "/despesas", icon: Wallet, roles: ["ceo", "financeiro"] },
-  { name: "Cheques", href: "/cheques", icon: Users, roles: ["ceo", "financeiro"] },
+  { name: "Cheques", href: "/cheques", icon: Banknote, roles: ["ceo", "financeiro"] }, // Corrigido para Banknote
   { name: "Lucro", href: "/lucro", icon: BarChart, roles: ["ceo", "financeiro"] },
 ];
 
