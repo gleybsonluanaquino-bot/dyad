@@ -7,14 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
-import { User, Lock, Check, X, ChevronDown } from "lucide-react";
+import { User, Lock, Check, X } from "lucide-react";
 import Logo from "@/components/Logo";
+import BranchSelector from "@/components/BranchSelector";
 
 const Login = () => {
   const navigate = useNavigate();
   const { session, isLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [selectedBranchId, setSelectedBranchId] = useState("01"); // Estado para a filial
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -27,9 +29,11 @@ const Login = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // O Supabase exige um e-mail para signInWithPassword.
-    // Mantemos a variável 'email' e o tipo 'email' no input para validação básica,
-    // mas o rótulo e placeholder serão alterados para 'Usuário'.
+    // Nota: O ID da filial selecionada (selectedBranchId) pode ser usado aqui
+    // para enviar junto com as credenciais, se o backend exigir.
+    // Por enquanto, apenas logamos o ID para demonstração.
+    console.log("Tentando login na filial:", selectedBranchId);
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -67,29 +71,22 @@ const Login = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-6">
-            {/* Seletor de Empresa/Filial (Mockup) */}
-            <div className="space-y-2">
-              <Label htmlFor="empresa">Empresa/Filial</Label>
-              <div className="relative">
-                <Input
-                  id="empresa"
-                  value="01 - JANIO DOS BONÉS (Mock)"
-                  readOnly
-                  className="pr-10 bg-gray-50 dark:bg-gray-700 cursor-pointer"
-                />
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-              </div>
-            </div>
+            
+            {/* Seletor de Empresa/Filial */}
+            <BranchSelector 
+              onBranchChange={setSelectedBranchId} 
+              disabled={isSubmitting}
+            />
 
-            {/* Campo Usuário (E-mail) - Rótulo alterado para 'Usuário' */}
+            {/* Campo Usuário */}
             <div className="space-y-2">
               <Label htmlFor="email">Usuário</Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="email"
-                  type="email" // Mantemos o tipo 'email' para validação do navegador
-                  placeholder="Seu usuário de acesso" // Placeholder ajustado
+                  type="email"
+                  placeholder="Seu usuário de acesso"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
