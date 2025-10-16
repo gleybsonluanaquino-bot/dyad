@@ -47,7 +47,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onBackToLogin }) => {
         data: {
           first_name: firstName,
           last_name: lastName,
-          username: username, // Armazenamos o nome de usuário no metadata
+          username: username as string, // Garantindo que é uma string
         },
       },
     });
