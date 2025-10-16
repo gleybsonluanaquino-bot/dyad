@@ -5,7 +5,7 @@ const Lucro = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold flex items-center gap-2">
-        <BarChart3 className="w-6 h-6" /> Lucro / Balanço
+        <BarChart3 className="w-6 h-6" /> Lucro
       </h1>
       <Card>
         <CardHeader>

@@ -21,14 +21,14 @@ import Logo from "./Logo";
 
 const navItems = [
   { name: "Dashboard", href: "/", icon: Home, roles: ["ceo", "user"] },
-  { name: "Caixa (Varejo)", href: "/caixa", icon: DollarSign, roles: ["ceo", "caixa"] },
-  { name: "Atacadista", href: "/atacadista", icon: DollarSign, roles: ["ceo", "atacado"] },
+  { name: "Caixa", href: "/caixa", icon: DollarSign, roles: ["ceo", "caixa"] },
+  { name: "Caixa (Atacadista)", href: "/atacadista", icon: DollarSign, roles: ["ceo", "atacado"] },
   { name: "Cobranças", href: "/cobrancas", icon: Receipt, roles: ["ceo", "cobranca"] },
   { name: "Fornecedores", href: "/fornecedores", icon: Truck, roles: ["ceo", "compras"] },
   { name: "Estoque", href: "/estoque", icon: Package, roles: ["ceo", "estoque"] },
   { name: "Despesas", href: "/despesas", icon: Wallet, roles: ["ceo", "financeiro"] },
   { name: "Cheques", href: "/cheques", icon: Users, roles: ["ceo", "financeiro"] },
-  { name: "Lucro/Balanço", href: "/lucro", icon: BarChart, roles: ["ceo", "financeiro"] },
+  { name: "Lucro", href: "/lucro", icon: BarChart, roles: ["ceo", "financeiro"] },
 ];
 
 interface NavLinkProps {
