@@ -10,14 +10,86 @@ import { showError, showSuccess } from "@/utils/toast";
 import { User, Lock, Check, X } from "lucide-react";
 import Logo from "@/components/Logo";
 import BranchSelector from "@/components/BranchSelector";
+import RegisterForm from "@/components/RegisterForm";
+
+// Componente de Formulário de Login
+const LoginForm = ({ isSubmitting, email, setEmail, password, setPassword, handleLogin, selectedBranchId, setSelectedBranchId }: any) => (
+  <form onSubmit={handleLogin} className="space-y-6">
+    
+    {/* Seletor de Empresa/Filial */}
+    <BranchSelector 
+      onBranchChange={setSelectedBranchId} 
+      disabled={isSubmitting}
+    />
+
+    {/* Campo Usuário */}
+    <div className="space-y-2">
+      <Label htmlFor="email">Usuário</Label>
+      <div className="relative">
+        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          id="email"
+          type="email"
+          placeholder="Seu usuário de acesso"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          disabled={isSubmitting}
+          className="pl-10"
+        />
+      </div>
+    </div>
+
+    {/* Campo Senha */}
+    <div className="space-y-2">
+      <Label htmlFor="password">Senha</Label>
+      <div className="relative">
+        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          id="password"
+          type="password"
+          placeholder="Sua senha"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          disabled={isSubmitting}
+          className="pl-10"
+        />
+      </div>
+    </div>
+
+    {/* Botões OK e Cancelar */}
+    <div className="grid grid-cols-2 gap-4 pt-4">
+      <Button type="submit" disabled={isSubmitting} className="h-12 text-lg">
+        <Check className="w-5 h-5 mr-2" />
+        OK
+      </Button>
+      <Button 
+        type="button" 
+        variant="outline" 
+        disabled={isSubmitting}
+        onClick={() => {
+          setEmail("");
+          setPassword("");
+        }}
+        className="h-12 text-lg"
+      >
+        <X className="w-5 h-5 mr-2" />
+        Cancelar
+      </Button>
+    </div>
+  </form>
+);
+
 
 const Login = () => {
   const navigate = useNavigate();
   const { session, isLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [selectedBranchId, setSelectedBranchId] = useState("01"); // Estado para a filial
+  const [selectedBranchId, setSelectedBranchId] = useState("01");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false); // Novo estado para alternar
 
   useEffect(() => {
     if (session) {
@@ -29,9 +101,6 @@ const Login = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Nota: O ID da filial selecionada (selectedBranchId) pode ser usado aqui
-    // para enviar junto com as credenciais, se o backend exigir.
-    // Por enquanto, apenas logamos o ID para demonstração.
     console.log("Tentando login na filial:", selectedBranchId);
 
     const { error } = await supabase.auth.signInWithPassword({
@@ -55,6 +124,9 @@ const Login = () => {
     );
   }
 
+  const title = isRegistering ? "Cadastro de Usuário" : "Acesso ao Sistema";
+  const subtitle = isRegistering ? "Preencha seus dados para criar uma nova conta." : "Insira suas credenciais para continuar.";
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
       <Card className="w-full max-w-md shadow-2xl">
@@ -63,89 +135,57 @@ const Login = () => {
             <Logo size="lg" />
           </div>
           <CardTitle className="text-2xl font-bold">
-            Acesso ao Sistema
+            {title}
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Insira suas credenciais para continuar.
+            {subtitle}
           </p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-6">
-            
-            {/* Seletor de Empresa/Filial */}
-            <BranchSelector 
-              onBranchChange={setSelectedBranchId} 
-              disabled={isSubmitting}
+          {isRegistering ? (
+            <RegisterForm onBackToLogin={() => setIsRegistering(false)} />
+          ) : (
+            <LoginForm 
+              isSubmitting={isSubmitting}
+              email={email}
+              setEmail={setEmail}
+              password={password}
+              setPassword={setPassword}
+              handleLogin={handleLogin}
+              selectedBranchId={selectedBranchId}
+              setSelectedBranchId={setSelectedBranchId}
             />
-
-            {/* Campo Usuário */}
-            <div className="space-y-2">
-              <Label htmlFor="email">Usuário</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Seu usuário de acesso"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={isSubmitting}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            {/* Campo Senha */}
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Sua senha"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isSubmitting}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            {/* Botões OK e Cancelar */}
-            <div className="grid grid-cols-2 gap-4 pt-4">
-              <Button type="submit" disabled={isSubmitting} className="h-12 text-lg">
-                <Check className="w-5 h-5 mr-2" />
-                OK
-              </Button>
-              <Button 
-                type="button" 
-                variant="outline" 
-                disabled={isSubmitting}
-                onClick={() => {
-                  setEmail("");
-                  setPassword("");
-                }}
-                className="h-12 text-lg"
-              >
-                <X className="w-5 h-5 mr-2" />
-                Cancelar
-              </Button>
-            </div>
-            
-            {/* Link Solicitar Acesso / Esqueceu a Senha */}
-            <div className="text-center pt-4">
+          )}
+          
+          {/* Link para alternar entre Login e Cadastro */}
+          <div className="text-center pt-6 border-t mt-6">
+            {isRegistering ? (
               <a 
                 href="#" 
-                onClick={() => showError("Funcionalidade de recuperação de senha em desenvolvimento.")}
+                onClick={() => setIsRegistering(false)}
                 className="text-sm text-primary hover:underline"
               >
-                Solicitar Acesso / Esqueceu a Senha
+                Já tem uma conta? Faça Login
               </a>
-            </div>
-          </form>
+            ) : (
+              <div className="space-y-2">
+                <a 
+                  href="#" 
+                  onClick={() => setIsRegistering(true)}
+                  className="text-sm text-primary hover:underline block"
+                >
+                  Não tem acesso? Cadastre-se aqui
+                </a>
+                <a 
+                  href="#" 
+                  onClick={() => showError("Funcionalidade de recuperação de senha em desenvolvimento.")}
+                  className="text-sm text-muted-foreground hover:underline block"
+                >
+                  Esqueceu a Senha?
+                </a>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
