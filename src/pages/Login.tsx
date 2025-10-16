@@ -6,6 +6,58 @@ import { useEffect } from "react";
 import { useAuth } from "@/integrations/supabase/session-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+// Definição das traduções em português (pt-BR)
+const i18n = {
+  pt: {
+    sign_in: {
+      email_label: "E-mail",
+      password_label: "Senha",
+      button_label: "Entrar",
+      social_auth_message: "Entrar com provedor",
+      link_text: "Já tem uma conta? Faça login",
+      confirmation_message: "Verifique seu e-mail para o link de login mágico.",
+    },
+    sign_up: {
+      email_label: "E-mail",
+      password_label: "Criar Senha",
+      button_label: "Cadastrar",
+      social_auth_message: "Cadastrar com provedor",
+      link_text: "Não tem uma conta? Cadastre-se",
+      confirmation_message: "Verifique seu e-mail para o link de confirmação.",
+    },
+    forgotten_password: {
+      email_label: "E-mail",
+      password_label: "Sua Senha",
+      button_label: "Enviar instruções de redefinição",
+      link_text: "Esqueceu sua senha?",
+      confirmation_message: "Verifique seu e-mail para o link de redefinição de senha.",
+    },
+    update_password: {
+      password_label: "Nova Senha",
+      password_input_placeholder: "Sua nova senha",
+      button_label: "Atualizar senha",
+      confirmation_message: "Sua senha foi atualizada.",
+    },
+    magic_link: {
+      email_input_label: "E-mail",
+      email_input_placeholder: "Seu endereço de e-mail",
+      button_label: "Enviar link mágico",
+      link_text: "Entrar com link mágico",
+      confirmation_message: "Verifique seu e-mail para o link de login mágico.",
+    },
+    verify_otp: {
+      email_input_label: "E-mail",
+      email_input_placeholder: "Seu endereço de e-mail",
+      phone_input_label: "Número de telefone",
+      phone_input_placeholder: "Seu número de telefone",
+      token_input_label: "Token",
+      token_input_placeholder: "Seu token OTP",
+      button_label: "Verificar token",
+      link_text: "Já tem um token? Verifique",
+    },
+  },
+};
+
 const Login = () => {
   const navigate = useNavigate();
   const { session, isLoading } = useAuth();
@@ -49,8 +101,13 @@ const Login = () => {
                 },
               },
             }}
-            theme="light" // Usando tema claro para melhor contraste inicial
+            theme="light"
             view="sign_in"
+            // Aplicando as traduções em português
+            localization={{
+              lang: "pt",
+              variables: i18n.pt,
+            }}
           />
         </CardContent>
       </Card>
