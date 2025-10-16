@@ -26,7 +26,7 @@ export const SessionContextProvider: React.FC<{ children: React.ReactNode }> = (
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
-        if (event === "SIGNED_OUT" || event === "USER_DELETED") {
+        if (event === "SIGNED_OUT") {
           setSession(null);
           setUser(null);
         } else if (currentSession) {
