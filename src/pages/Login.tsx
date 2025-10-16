@@ -27,6 +27,9 @@ const Login = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // O Supabase exige um e-mail para signInWithPassword.
+    // Mantemos a variável 'email' e o tipo 'email' no input para validação básica,
+    // mas o rótulo e placeholder serão alterados para 'Usuário'.
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -78,15 +81,15 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Campo Usuário (E-mail) */}
+            {/* Campo Usuário (E-mail) - Rótulo alterado para 'Usuário' */}
             <div className="space-y-2">
-              <Label htmlFor="email">Usuário (E-mail)</Label>
+              <Label htmlFor="email">Usuário</Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="email"
-                  type="email"
-                  placeholder="Seu e-mail de acesso"
+                  type="email" // Mantemos o tipo 'email' para validação do navegador
+                  placeholder="Seu usuário de acesso" // Placeholder ajustado
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
