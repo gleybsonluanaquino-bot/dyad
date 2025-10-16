@@ -8,19 +8,19 @@ export const Hero = () => {
         <div className="flex flex-col items-center space-y-4 text-center">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-              Build Your Next Big Thing
+              Construa Sua Próxima Grande Ideia
             </h1>
             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-              A beautiful and simple starting point for your next project.
-              Powered by Dyad.
+              Um ponto de partida bonito e simples para o seu próximo projeto.
+              Criado com Dyad.
             </p>
           </div>
           <div className="space-x-4">
             <Link to="#">
-              <Button>Get Started</Button>
+              <Button>Começar</Button>
             </Link>
             <Link to="#">
-              <Button variant="secondary">Learn More</Button>
+              <Button variant="secondary">Saiba Mais</Button>
             </Link>
           </div>
         </div>
