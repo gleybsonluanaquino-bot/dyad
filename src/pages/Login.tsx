@@ -97,35 +97,30 @@ const Login = () => {
     }
   }, [session, navigate]);
 
+  // Função RPC para resolver o nome de usuário para o e-mail
   const resolveUsernameToEmail = async (username: string): Promise<string | null> => {
     try {
-      // URL da Edge Function (usando o ID do projeto)
-      const functionUrl = `https://imzwknqvxqfqldnczpdv.supabase.co/functions/v1/resolve-username`;
-      
-      const response = await fetch(functionUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username }),
+      // Chamando a função RPC do banco de dados
+      const { data: email, error } = await supabase.rpc('get_email_by_username', {
+        p_username: username,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Se o erro for 404 (User not found), retornamos null silenciosamente
-        if (response.status === 404) {
-            return null;
-        }
-        // Para outros erros (500, 400), lançamos um erro para ser capturado
-        throw new Error(data.error || 'Erro desconhecido ao resolver nome de usuário.');
+      if (error) {
+        console.error("Erro RPC ao resolver nome de usuário:", error);
+        // Se houver erro, tratamos como falha de comunicação
+        showError("Erro de comunicação com o servidor. Tente novamente.");
+        return null;
       }
 
-      return data.email;
+      // Se data for null ou undefined, o usuário não foi encontrado
+      if (!email) {
+        return null;
+      }
+
+      return email;
     } catch (error) {
-      console.error("Erro na Edge Function:", error);
-      // Se houver um erro de rede ou outro erro interno, tratamos como falha
-      showError("Erro de comunicação com o servidor. Tente novamente.");
+      console.error("Erro inesperado ao resolver nome de usuário:", error);
+      showError("Erro interno. Tente novamente.");
       return null;
     }
   };
@@ -140,7 +135,7 @@ const Login = () => {
       return;
     }
 
-    // 1. Resolver o nome de usuário para o e-mail real (ou fictício)
+    // 1. Resolver o nome de usuário para o e-mail real (ou fictício) usando RPC
     const emailToLogin = await resolveUsernameToEmail(username);
 
     if (!emailToLogin) {
