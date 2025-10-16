@@ -36,7 +36,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onBackToLogin }) => {
     if (!finalEmail) {
       // Sanitiza o nome de usuário para uso no e-mail
       const sanitizedUsername = username.toLowerCase().replace(/[^a-z0-9]/g, '');
-      finalEmail = `${sanitizedUsername}_${Date.now()}@temp.com`;
+      // Usamos um prefixo único para evitar colisões e garantir que o e-mail seja válido
+      finalEmail = `user_${sanitizedUsername}_${Date.now()}@temp.com`;
     }
 
     // 2. Chamar o Supabase signUp
@@ -47,7 +48,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onBackToLogin }) => {
         data: {
           first_name: firstName,
           last_name: lastName,
-          username: username as string, // Garantindo que é uma string
+          username: username, // Salvando o username no metadata
         },
       },
     });
@@ -55,7 +56,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onBackToLogin }) => {
     if (error) {
       showError("Falha no cadastro: " + error.message);
     } else {
-      showSuccess("Cadastro realizado! Se você forneceu um e-mail, verifique-o para confirmar sua conta.");
+      // Se a confirmação de e-mail estiver desativada no Supabase, o login deve ser imediato.
+      showSuccess("Cadastro realizado! Você já pode fazer login.");
       onBackToLogin();
     }
     setIsSubmitting(false);
