@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "@/integrations/supabase/session-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,13 +7,31 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
-import { User, Lock, Check, X } from "lucide-react";
+import { User, Lock, Check, X, Mail } from "lucide-react";
 import Logo from "@/components/Logo";
 import BranchSelector from "@/components/BranchSelector";
 import RegisterForm from "@/components/RegisterForm";
 
 // Componente de Formulário de Login
-const LoginForm = ({ isSubmitting, username, setUsername, password, setPassword, handleLogin, selectedBranchId, setSelectedBranchId }: any) => (
+interface LoginFormProps {
+  isSubmitting: boolean;
+  username: string;
+  setUsername: React.Dispatch<React.SetStateAction<string>>;
+  password: string;
+  setPassword: React.Dispatch<React.SetStateAction<string>>;
+  handleLogin: (e: React.FormEvent) => Promise<void>;
+  setSelectedBranchId: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({ 
+  isSubmitting, 
+  username, 
+  setUsername, 
+  password, 
+  setPassword, 
+  handleLogin, 
+  setSelectedBranchId 
+}) => (
   <form onSubmit={handleLogin} className="space-y-6">
     
     {/* Seletor de Empresa/Filial */}
@@ -29,7 +47,7 @@ const LoginForm = ({ isSubmitting, username, setUsername, password, setPassword,
         <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           id="username"
-          type="text" // Alterado para 'text'
+          type="text"
           placeholder="Seu usuário de acesso"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -85,7 +103,7 @@ const LoginForm = ({ isSubmitting, username, setUsername, password, setPassword,
 const Login = () => {
   const navigate = useNavigate();
   const { session, isLoading } = useAuth();
-  const [username, setUsername] = useState(""); // Alterado de email para username
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [selectedBranchId, setSelectedBranchId] = useState("01");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -107,12 +125,10 @@ const Login = () => {
 
       if (error) {
         console.error("Erro RPC ao resolver nome de usuário:", error);
-        // Se houver erro, tratamos como falha de comunicação
         showError("Erro de comunicação com o servidor. Tente novamente.");
         return null;
       }
 
-      // Se data for null ou undefined, o usuário não foi encontrado
       if (!email) {
         return null;
       }
@@ -186,6 +202,7 @@ const Login = () => {
           </p>
         </CardHeader>
         <CardContent>
+          {/* Alternância de Formulários */}
           {isRegistering ? (
             <RegisterForm onBackToLogin={() => setIsRegistering(false)} />
           ) : (
@@ -196,7 +213,6 @@ const Login = () => {
               password={password}
               setPassword={setPassword}
               handleLogin={handleLogin}
-              selectedBranchId={selectedBranchId}
               setSelectedBranchId={setSelectedBranchId}
             />
           )}
@@ -206,7 +222,7 @@ const Login = () => {
             {isRegistering ? (
               <a 
                 href="#" 
-                onClick={() => setIsRegistering(false)}
+                onClick={(e) => { e.preventDefault(); setIsRegistering(false); }}
                 className="text-sm text-primary hover:underline"
               >
                 Já tem uma conta? Faça Login
@@ -215,14 +231,14 @@ const Login = () => {
               <div className="space-y-2">
                 <a 
                   href="#" 
-                  onClick={() => setIsRegistering(true)}
+                  onClick={(e) => { e.preventDefault(); setIsRegistering(true); }}
                   className="text-sm text-primary hover:underline block"
                 >
                   Não tem acesso? Cadastre-se aqui
                 </a>
                 <a 
                   href="#" 
-                  onClick={() => showError("Funcionalidade de recuperação de senha em desenvolvimento.")}
+                  onClick={(e) => { e.preventDefault(); showError("Funcionalidade de recuperação de senha em desenvolvimento."); }}
                   className="text-sm text-muted-foreground hover:underline block"
                 >
                   Esqueceu a Senha?
