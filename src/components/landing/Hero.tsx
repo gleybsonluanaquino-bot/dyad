@@ -16,7 +16,7 @@ export const Hero = () => {
             </p>
           </div>
           <div className="space-x-4">
-            <Link to="#">
+            <Link to="/dashboard">
               <Button>Começar</Button>
             </Link>
             <Link to="#">
