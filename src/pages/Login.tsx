@@ -13,7 +13,7 @@ import BranchSelector from "@/components/BranchSelector";
 import RegisterForm from "@/components/RegisterForm";
 
 // Componente de Formulário de Login
-const LoginForm = ({ isSubmitting, email, setEmail, password, setPassword, handleLogin, selectedBranchId, setSelectedBranchId }: any) => (
+const LoginForm = ({ isSubmitting, username, setUsername, password, setPassword, handleLogin, selectedBranchId, setSelectedBranchId }: any) => (
   <form onSubmit={handleLogin} className="space-y-6">
     
     {/* Seletor de Empresa/Filial */}
@@ -24,15 +24,15 @@ const LoginForm = ({ isSubmitting, email, setEmail, password, setPassword, handl
 
     {/* Campo Usuário */}
     <div className="space-y-2">
-      <Label htmlFor="email">Usuário</Label>
+      <Label htmlFor="username">Usuário</Label>
       <div className="relative">
         <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          id="email"
-          type="email"
+          id="username"
+          type="text" // Alterado para 'text'
           placeholder="Seu usuário de acesso"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
           disabled={isSubmitting}
           className="pl-10"
@@ -69,7 +69,7 @@ const LoginForm = ({ isSubmitting, email, setEmail, password, setPassword, handl
         variant="outline" 
         disabled={isSubmitting}
         onClick={() => {
-          setEmail("");
+          setUsername("");
           setPassword("");
         }}
         className="h-12 text-lg"
@@ -85,11 +85,11 @@ const LoginForm = ({ isSubmitting, email, setEmail, password, setPassword, handl
 const Login = () => {
   const navigate = useNavigate();
   const { session, isLoading } = useAuth();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState(""); // Alterado de email para username
   const [password, setPassword] = useState("");
   const [selectedBranchId, setSelectedBranchId] = useState("01");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false); // Novo estado para alternar
+  const [isRegistering, setIsRegistering] = useState(false);
 
   useEffect(() => {
     if (session) {
@@ -97,14 +97,57 @@ const Login = () => {
     }
   }, [session, navigate]);
 
+  const resolveUsernameToEmail = async (username: string): Promise<string | null> => {
+    try {
+      // URL da Edge Function (usando o ID do projeto)
+      const functionUrl = `https://imzwknqvxqfqldnczpdv.supabase.co/functions/v1/resolve-username`;
+      
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabase.auth.session()?.access_token || ''}`,
+        },
+        body: JSON.stringify({ username }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao resolver nome de usuário.');
+      }
+
+      return data.email;
+    } catch (error) {
+      console.error("Erro na Edge Function:", error);
+      return null;
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    console.log("Tentando login na filial:", selectedBranchId);
+    if (!username || !password) {
+      showError("Por favor, preencha Usuário e Senha.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // 1. Resolver o nome de usuário para o e-mail real (ou fictício)
+    const emailToLogin = await resolveUsernameToEmail(username);
+
+    if (!emailToLogin) {
+      showError("Usuário não encontrado ou erro de rede.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    // 2. Tentar login com o e-mail resolvido
+    console.log(`Tentando login com e-mail resolvido: ${emailToLogin} na filial: ${selectedBranchId}`);
 
     const { error } = await supabase.auth.signInWithPassword({
-      email,
+      email: emailToLogin,
       password,
     });
 
@@ -147,8 +190,8 @@ const Login = () => {
           ) : (
             <LoginForm 
               isSubmitting={isSubmitting}
-              email={email}
-              setEmail={setEmail}
+              username={username}
+              setUsername={setUsername}
               password={password}
               setPassword={setPassword}
               handleLogin={handleLogin}

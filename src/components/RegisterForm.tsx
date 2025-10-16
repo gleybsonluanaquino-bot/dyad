@@ -13,7 +13,8 @@ interface RegisterFormProps {
 const RegisterForm: React.FC<RegisterFormProps> = ({ onBackToLogin }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState(""); // Novo campo para o nome de usuário
+  const [email, setEmail] = useState(""); // Campo de e-mail agora opcional
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -21,19 +22,32 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onBackToLogin }) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    if (!firstName || !lastName || !email || !password) {
-      showError("Por favor, preencha todos os campos.");
+    if (!firstName || !lastName || !username || !password) {
+      showError("Por favor, preencha Nome, Sobrenome, Usuário e Senha.");
       setIsSubmitting(false);
       return;
     }
 
+    // 1. Determinar o e-mail a ser usado no Supabase
+    let finalEmail = email.trim();
+    
+    // Se o campo de e-mail opcional estiver vazio, criamos um e-mail fictício
+    // usando o nome de usuário fornecido.
+    if (!finalEmail) {
+      // Sanitiza o nome de usuário para uso no e-mail
+      const sanitizedUsername = username.toLowerCase().replace(/[^a-z0-9]/g, '');
+      finalEmail = `${sanitizedUsername}_${Date.now()}@temp.com`;
+    }
+
+    // 2. Chamar o Supabase signUp
     const { error } = await supabase.auth.signUp({
-      email,
+      email: finalEmail,
       password,
       options: {
         data: {
           first_name: firstName,
           last_name: lastName,
+          username: username, // Armazenamos o nome de usuário no metadata
         },
       },
     });
@@ -41,8 +55,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onBackToLogin }) => {
     if (error) {
       showError("Falha no cadastro: " + error.message);
     } else {
-      showSuccess("Cadastro realizado! Verifique seu e-mail para confirmar sua conta.");
-      // O usuário deve ser redirecionado para o login após a confirmação do e-mail
+      showSuccess("Cadastro realizado! Se você forneceu um e-mail, verifique-o para confirmar sua conta.");
       onBackToLogin();
     }
     setIsSubmitting(false);
@@ -53,7 +66,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onBackToLogin }) => {
       <div className="grid grid-cols-2 gap-4">
         {/* Nome */}
         <div className="space-y-2">
-          <Label htmlFor="firstName">Nome</Label>
+          <Label htmlFor="firstName">Nome *</Label>
           <Input
             id="firstName"
             type="text"
@@ -66,7 +79,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onBackToLogin }) => {
         </div>
         {/* Sobrenome */}
         <div className="space-y-2">
-          <Label htmlFor="lastName">Sobrenome</Label>
+          <Label htmlFor="lastName">Sobrenome *</Label>
           <Input
             id="lastName"
             type="text"
@@ -79,18 +92,35 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onBackToLogin }) => {
         </div>
       </div>
 
-      {/* E-mail */}
+      {/* Nome de Usuário (Obrigatório para login sem e-mail) */}
       <div className="space-y-2">
-        <Label htmlFor="registerEmail">E-mail</Label>
+        <Label htmlFor="username">Usuário de Acesso *</Label>
+        <div className="relative">
+          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            id="username"
+            type="text"
+            placeholder="Nome de usuário único"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            disabled={isSubmitting}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
+      {/* E-mail (Opcional) */}
+      <div className="space-y-2">
+        <Label htmlFor="registerEmail">E-mail (Opcional)</Label>
         <div className="relative">
           <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             id="registerEmail"
             type="email"
-            placeholder="Seu e-mail (será seu usuário)"
+            placeholder="Para recuperação de senha"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
             disabled={isSubmitting}
             className="pl-10"
           />
@@ -99,7 +129,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onBackToLogin }) => {
 
       {/* Senha */}
       <div className="space-y-2">
-        <Label htmlFor="registerPassword">Senha</Label>
+        <Label htmlFor="registerPassword">Senha *</Label>
         <div className="relative">
           <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
