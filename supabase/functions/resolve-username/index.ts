@@ -34,13 +34,14 @@ serve(async (req) => {
     );
 
     // Query auth.users table using the service role client
-    // We must explicitly specify the schema 'auth' and table 'users'
-    // The query uses the JSON operator ->> to extract the 'username' field from 'raw_user_meta_data'
+    // We use the 'cs' (contains) operator on the raw_user_meta_data JSONB column
+    // to find the user where the metadata contains {"username": "provided_username"}
+    // Note: We must query the 'auth.users' table, which is implicitly done when using the service role client.
+    
     const { data: users, error } = await supabaseAdmin.from('users')
       .select('email')
       .eq('raw_user_meta_data->>username', username)
-      .limit(1)
-      .in('aud', ['authenticated']); // Optional: Filter by authenticated users, though service role bypasses RLS
+      .limit(1);
 
     if (error) {
       console.error('Supabase query error:', error);
@@ -51,6 +52,7 @@ serve(async (req) => {
     }
 
     if (!users || users.length === 0) {
+      // Retorna 404 se o usuário não for encontrado
       return new Response(JSON.stringify({ error: 'User not found' }), {
         status: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

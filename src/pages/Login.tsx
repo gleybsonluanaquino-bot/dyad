@@ -102,7 +102,6 @@ const Login = () => {
       // URL da Edge Function (usando o ID do projeto)
       const functionUrl = `https://imzwknqvxqfqldnczpdv.supabase.co/functions/v1/resolve-username`;
       
-      // Não precisamos de token de autorização, pois a função usa o Service Role Key
       const response = await fetch(functionUrl, {
         method: 'POST',
         headers: {
@@ -118,7 +117,8 @@ const Login = () => {
         if (response.status === 404) {
             return null;
         }
-        throw new Error(data.error || 'Erro ao resolver nome de usuário.');
+        // Para outros erros (500, 400), lançamos um erro para ser capturado
+        throw new Error(data.error || 'Erro desconhecido ao resolver nome de usuário.');
       }
 
       return data.email;
