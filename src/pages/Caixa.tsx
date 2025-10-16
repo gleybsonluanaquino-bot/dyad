@@ -5,7 +5,7 @@ const Caixa = () => {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold flex items-center gap-2">
-        <DollarSign className="w-6 h-6" /> Caixa (Varejo)
+        <DollarSign className="w-6 h-6" /> Caixa
       </h1>
       <Card>
         <CardHeader>
